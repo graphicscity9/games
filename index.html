@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Brick Breaker Game</title>
+  <style>
+    body {
+      background-color: #000000;
+      margin: 0;
+      overflow: hidden;
+    }
+    
+    #game {
+      position: relative;
+      width: 800px;
+      height: 600px;
+      margin: 0 auto;
+      background-color: #FFFFFF;
+    }
+    
+    .paddle {
+      position: absolute;
+      bottom: 10px;
+      width: 80px;
+      height: 10px;
+      background-color: #000000;
+    }
+    
+    .ball {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background-color: #FF0000;
+      border-radius: 50%;
+    }
+    
+    .brick {
+      width: 75px;
+      height: 20px;
+      margin: 10px;
+      background-color: #0000FF;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div class="paddle" id="paddle"></div>
+    <div class="ball" id="ball"></div>
+    <div id="bricks"></div>
+  </div>
+
+  <script>
+    // Game variables
+    const game = document.getElementById("game");
+    const paddle = document.getElementById("paddle");
+    const ball = document.getElementById("ball");
+    const bricksContainer = document.getElementById("bricks");
+    const bricks = [];
+    let paddleX = 360;
+    let ballX = 390;
+    let ballY = 550;
+    let ballSpeedX = 3;
+    let ballSpeedY = -3;
+    let score = 0;
+
+    // Create bricks
+    for (let i = 0; i < 5; i++) {
+      for (let j = 0; j < 8; j++) {
+        const brick = document.createElement("div");
+        brick.classList.add("brick");
+        brick.style.left = j * 85 + "px";
+        brick.style.top = i * 30 + "px";
+        bricksContainer.appendChild(brick);
+        bricks.push(brick);
+      }
+    }
+
+    // Move paddle
+    function movePaddle(event) {
+      paddleX = event.clientX - game.getBoundingClientRect().left - paddle.offsetWidth / 2;
+      if (paddleX < 0) {
+        paddleX = 0;
+      } else if (paddleX > game.offsetWidth - paddle.offsetWidth) {
+        paddleX = game.offsetWidth - paddle.offsetWidth;
+      }
+      paddle.style.left = paddleX + "px";
+    }
+
+    // Game loop
+    function gameLoop() {
+      // Move ball
+      ballX += ballSpeedX;
+      ballY += ballSpeedY;
+      ball.style.left = ballX + "px";
+      ball.style.top = ballY + "px";
+
+      // Check collision with paddle
+      if (
+        ballY + ball.offsetHeight >= paddle.offsetTop &&
+        ballY <= paddle.offsetTop + paddle.offsetHeight &&
+        ballX + ball.offsetWidth >= paddle.offsetLeft &&
+        ballX <= paddle.offsetLeft + paddle.offsetWidth
+      ) {
+        ballSpeedY = -ballSpeedY;
+      }
+
+      // Check collision with bricks
+      bricks.forEach((brick, index) => {
+        if (
+          ballY + ball.offsetHeight >= brick.offsetTop &&
+          ballY <= brick.offsetTop + brick.offsetHeight &&
+          ballX + ball.offsetWidth >= brick.offsetLeft &&
+          ballX <= brick.offsetLeft + brick.offsetWidth
+        ) {
+          ballSpeedY = -ballSpeedY;
+          brick.remove();
+          bricks.splice(index, 1);
+          score++;
+          if (score === 40) {
+            alert("Congratulations! You won!");
+            document.location.reload();
+          }
+        }
+      });
+
+      // Check collision with walls
+      if (ballX <= 0 || ballX + ball.offsetWidth >= game.offsetWidth) {
+        ballSpeedX = -ballSpeedX;
+      }
+      if (ballY <= 0) {
+        ballSpeedY = -ballSpeedY;
+      }
+      if (ballY + ball.offsetHeight >= game.offsetHeight) {
+        alert("Game Over!");
+        document.location.reload();
+      }
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Event listeners
+    document.addEventListener("mousemove", movePaddle);
+
+    // Start the game loop
+    gameLoop();
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Brick Breaker Game</title>
+  <style>
+    /* ... previous CSS code ... */
+
+    #score {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: #FFFFFF;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div class="paddle" id="paddle"></div>
+    <div class="ball" id="ball"></div>
+    <div id="bricks"></div>
+  </div>
+  <div id="score">Score: 0</div>
+
+  <script>
+    // ... previous JavaScript code ...
+
+    // Update score display
+    function updateScore() {
+      const scoreElement = document.getElementById("score");
+      scoreElement.textContent = "Score: " + score;
+    }
+
+    // Event listeners
+    document.addEventListener("mousemove", movePaddle);
+
+    // Start the game loop
+    gameLoop();
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Brick Breaker Game</title>
+  <style>
+    /* ... previous CSS code ... */
+
+    #gameover {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #FFFFFF;
+      font-size: 40px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div class="paddle" id="paddle"></div>
+    <div class="ball" id="ball"></div>
+    <div id="bricks"></div>
+    <div id="score">Score: 0</div>
+    <div id="gameover">Game Over!</div>
+  </div>
+
+  <script>
+    // ... previous JavaScript code ...
+
+    const gameover = document.getElementById("gameover");
+
+    // Check if the game is over
+    function checkGameOver() {
+      if (bricks.length === 0) {
+        gameover.style.display = "block";
+        document.removeEventListener("mousemove", movePaddle);
+        return true;
+      }
+      return false;
+    }
+
+    // Game loop
+    function gameLoop() {
+      // ... previous gameLoop code ...
+
+      if (!checkGameOver()) {
+        requestAnimationFrame(gameLoop);
+      }
+    }
+
+    // Event listeners
+    document.addEventListener("mousemove", movePaddle);
+
+    // Start the game loop
+    gameLoop();
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Brick Breaker Game</title>
+  <style>
+    /* ... previous CSS code ... */
+
+    #gameover {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #FFFFFF;
+      font-size: 40px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div class="paddle" id="paddle"></div>
+    <div class="ball" id="ball"></div>
+    <div id="bricks"></div>
+    <div id="score">Score: 0</div>
+    <div id="gameover">Game Over!</div>
+  </div>
+
+  <script>
+    // ... previous JavaScript code ...
+
+    const gameover = document.getElementById("gameover");
+
+    // Check if the game is over
+    function checkGameOver() {
+      if (bricks.length === 0) {
+        gameover.style.display = "block";
+        document.removeEventListener("mousemove", movePaddle);
+        document.removeEventListener("click", startGame);
+        return true;
+      }
+      return false;
+    }
+
+    // Start the game
+    function startGame() {
+      gameover.style.display = "none";
+      bricksContainer.innerHTML = ""; // Clear previous bricks
+      bricks.length = 0; // Clear the bricks array
+      createBricks(); // Recreate bricks
+      score = 0; // Reset score
+      updateScore();
+      ballX = 390; // Reset ball position
+      ballY = 550;
+      ballSpeedX = 3; // Reset ball speed
+      ballSpeedY = -3; 
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Event listeners
+    document.addEventListener("mousemove", movePaddle);
+    document.addEventListener("click", startGame);
+
+    // Start the game
+    startGame();
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Brick Breaker Game</title>
+  <style>
+    /* ... previous CSS code ... */
+
+    #gameover {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #FFFFFF;
+      font-size: 40px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div class="paddle" id="paddle"></div>
+    <div class="ball" id="ball"></div>
+    <div id="bricks"></div>
+    <div id="score">Score: 0</div>
+    <div id="gameover">Game Over!</div>
+  </div>
+
+  <script>
+    // ... previous JavaScript code ...
+
+    const gameover = document.getElementById("gameover");
+
+    // Check if the game is over
+    function checkGameOver() {
+      if (bricks.length === 0) {
+        gameover.style.display = "block";
+        document.removeEventListener("mousemove", movePaddle);
+        document.removeEventListener("click", startGame);
+        return true;
+      }
+      return false;
+    }
+
+    // Start the game
+    function startGame() {
+      gameover.style.display = "none";
+      bricksContainer.innerHTML = ""; // Clear previous bricks
+      bricks.length = 0; // Clear the bricks array
+      createBricks(); // Recreate bricks
+      score = 0; // Reset score
+      updateScore();
+      ballX = 390; // Reset ball position
+      ballY = 550;
+      ballSpeedX = 3; // Reset ball speed
+      ballSpeedY = -3; 
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Event listeners
+    document.addEventListener("mousemove", movePaddle);
+    document.addEventListener("click", startGame);
+
+    // Start the game
+    startGame();
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Brick Breaker Game</title>
+  <style>
+    /* ... previous CSS code ... */
+
+    #gameover {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #FFFFFF;
+      font-size: 40px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div class="paddle" id="paddle"></div>
+    <div class="ball" id="ball"></div>
+    <div id="bricks"></div>
+    <div id="score">Score: 0</div>
+    <div id="gameover">Game Over!</div>
+  </div>
+
+  <script>
+    // ... previous JavaScript code ...
+
+    const gameover = document.getElementById("gameover");
+
+    // Check if the game is over
+    function checkGameOver() {
+      if (bricks.length === 0) {
+        gameover.style.display = "block";
+        document.removeEventListener("mousemove", movePaddle);
+        document.removeEventListener("click", startGame);
+        return true;
+      }
+      return false;
+    }
+
+    // Start the game
+    function startGame() {
+      gameover.style.display = "none";
+      bricksContainer.innerHTML = ""; // Clear previous bricks
+      bricks.length = 0; // Clear the bricks array
+      createBricks(); // Recreate bricks
+      score = 0; // Reset score
+      updateScore();
+      ballX = 390; // Reset ball position
+      ballY = 550;
+      ballSpeedX = 3; // Reset ball speed
+      ballSpeedY = -3; 
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Event listeners
+    document.addEventListener("mousemove", movePaddle);
+    document.addEventListener("click", startGame);
+
+    // Start the game
+    startGame();
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Brick Breaker Game</title>
+  <style>
+    /* ... previous CSS code ... */
+
+    #gameover {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #FFFFFF;
+      font-size: 40px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div class="paddle" id="paddle"></div>
+    <div class="ball" id="ball"></div>
+    <div id="bricks"></div>
+    <div id="score">Score: 0</div>
+    <div id="gameover">Game Over!</div>
+  </div>
+
+  <script>
+    // ... previous JavaScript code ...
+
+    const gameover = document.getElementById("gameover");
+
+    // Check if the game is over
+    function checkGameOver() {
+      if (bricks.length === 0) {
+        gameover.style.display = "block";
+        document.removeEventListener("mousemove", movePaddle);
+        document.removeEventListener("click", startGame);
+        return true;
+      }
+      return false;
+    }
+
+    // Start the game
+    function startGame() {
+      gameover.style.display = "none";
+      bricksContainer.innerHTML = ""; // Clear previous bricks
+      bricks.length = 0; // Clear the bricks array
+      createBricks(); // Recreate bricks
+      score = 0; // Reset score
+      updateScore();
+      ballX = 390; // Reset ball position
+      ballY = 550;
+      ballSpeedX = 3; // Reset ball speed
+      ballSpeedY = -3; 
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Event listeners
+    document.addEventListener("mousemove", movePaddle);
+    document.addEventListener("click", startGame);
+
+    // Start the game
+    startGame();
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Brick Breaker Game</title>
+  <style>
+    /* ... previous CSS code ... */
+
+    #gameover {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #FFFFFF;
+      font-size: 40px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div class="paddle" id="paddle"></div>
+    <div class="ball" id="ball"></div>
+    <div id="bricks"></div>
+    <div id="score">Score: 0</div>
+    <div id="gameover">Game Over!</div>
+  </div>
+
+  <script>
+    // ... previous JavaScript code ...
+
+    const gameover = document.getElementById("gameover");
+
+    // Check if the game is over
+    function checkGameOver() {
+      if (bricks.length === 0) {
+        gameover.style.display = "block";
+        document.removeEventListener("mousemove", movePaddle);
+        document.removeEventListener("click", startGame);
+        return true;
+      }
+      return false;
+    }
+
+    // Start the game
+    function startGame() {
+      gameover.style.display = "none";
+      bricksContainer.innerHTML = ""; // Clear previous bricks
+      bricks.length = 0; // Clear the bricks array
+      createBricks(); // Recreate bricks
+      score = 0; // Reset score
+      updateScore();
+      ballX = 390; // Reset ball position
+      ballY = 550;
+      ballSpeedX = 3; // Reset ball speed
+      ballSpeedY = -3; 
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Event listeners
+    document.addEventListener("mousemove", movePaddle);
+    document.addEventListener("click", startGame);
+
+    // Start the game
+    startGame();
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Brick Breaker Game</title>
+  <style>
+    /* ... previous CSS code ... */
+
+    #gameover {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #FFFFFF;
+      font-size: 40px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div class="paddle" id="paddle"></div>
+    <div class="ball" id="ball"></div>
+    <div id="bricks"></div>
+    <div id="score">Score: 0</div>
+    <div id="gameover">Game Over!</div>
+  </div>
+
+  <script>
+    const paddle = document.getElementById("paddle");
+    const ball = document.getElementById("ball");
+    const bricksContainer = document.getElementById("bricks");
+    const scoreDisplay = document.getElementById("score");
+
+    let ballX = 390;
+    let ballY = 550;
+    let ballSpeedX = 3;
+    let ballSpeedY = -3;
+
+    let paddleX = 360;
+
+    let score = 0;
+
+    let bricks = [];
+
+    const brickRowCount = 5;
+    const brickColumnCount = 10;
+    const brickWidth = 70;
+    const brickHeight = 20;
+    const brickPadding = 10;
+    const brickOffsetTop = 30;
+    const brickOffsetLeft = 30;
+
+    function createBricks() {
+      for (let c = 0; c < brickColumnCount; c++) {
+        for (let r = 0; r < brickRowCount; r++) {
+          const brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
+          const brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
+          const brick = document.createElement("div");
+          brick.classList.add("brick");
+          brick.style.left = brickX + "px";
+          brick.style.top = brickY + "px";
+          bricksContainer.appendChild(brick);
+          bricks.push(brick);
+        }
+      }
+    }
+
+    function updateScore() {
+      scoreDisplay.innerText = "Score: " + score;
+    }
+
+    function movePaddle(e) {
+      const gameArea = document.getElementById("game");
+      const gameAreaRect = gameArea.getBoundingClientRect();
+      paddleX = e.clientX - gameAreaRect.left - paddle.offsetWidth / 2;
+      if (paddleX < 0) {
+        paddleX = 0;
+      }
+      if (paddleX > gameArea.offsetWidth - paddle.offsetWidth) {
+        paddleX = gameArea.offsetWidth - paddle.offsetWidth;
+      }
+      paddle.style.left = paddleX + "px";
+    }
+
+    function moveBall() {
+      ballX += ballSpeedX;
+      ballY += ballSpeedY;
+
+      if (ballX < 0 || ballX > 790) {
+        ballSpeedX *= -1;
+      }
+
+      if (ballY < 0) {
+        ballSpeedY *= -1;
+      }
+
+      if (ballY > 590) {
+        if (ballX > paddleX && ballX < paddleX + paddle.offsetWidth) {
+          ballSpeedY *= -1;
+        } else {
+          // Game over
+          clearInterval(gameInterval);
+          gameover.style.display = "block";
+        }
+      }
+
+      ball.style.left = ballX + "px";
+      ball.style.top = ballY + "px";
+    }
+
+    function check
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Brick Breaker Game</title>
+  <style>
+    /* ... previous CSS code ... */
+
+    #gameover {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #FFFFFF;
+      font-size: 40px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div class="paddle" id="paddle"></div>
+    <div class="ball" id="ball"></div>
+    <div id="bricks"></div>
+    <div id="score">Score: 0</div>
+    <div id="gameover">Game Over!</div>
+  </div>
+
+  <script>
+    const paddle = document.getElementById("paddle");
+    const ball = document.getElementById("ball");
+    const bricksContainer = document.getElementById("bricks");
+    const scoreDisplay = document.getElementById("score");
+
+    let ballX = 390;
+    let ballY = 550;
+    let ballSpeedX = 3;
+    let ballSpeedY = -3;
+
+    let paddleX = 360;
+
+    let score = 0;
+
+    let bricks = [];
+
+    const brickRowCount = 5;
+    const brickColumnCount = 10;
+    const brickWidth = 70;
+    const brickHeight = 20;
+    const brickPadding = 10;
+    const brickOffsetTop = 30;
+    const brickOffsetLeft = 30;
+
+    function createBricks() {
+      for (let c = 0; c < brickColumnCount; c++) {
+        for (let r = 0; r < brickRowCount; r++) {
+          const brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
+          const brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
+          const brick = document.createElement("div");
+          brick.classList.add("brick");
+          brick.style.left = brickX + "px";
+          brick.style.top = brickY + "px";
+          bricksContainer.appendChild(brick);
+          bricks.push(brick);
+        }
+      }
+    }
+
+    function updateScore() {
+      scoreDisplay.innerText = "Score: " + score;
+    }
+
+    function movePaddle(e) {
+      const gameArea = document.getElementById("game");
+      const gameAreaRect = gameArea.getBoundingClientRect();
+      paddleX = e.clientX - gameAreaRect.left - paddle.offsetWidth / 2;
+      if (paddleX < 0) {
+        paddleX = 0;
+      }
+      if (paddleX > gameArea.offsetWidth - paddle.offsetWidth) {
+        paddleX = gameArea.offsetWidth - paddle.offsetWidth;
+      }
+      paddle.style.left = paddleX + "px";
+    }
+
+    function moveBall() {
+      ballX += ballSpeedX;
+      ballY += ballSpeedY;
+
+      if (ballX < 0 || ballX > 790) {
+        ballSpeedX *= -1;
+      }
+
+      if (ballY < 0) {
+        ballSpeedY *= -1;
+      }
+
+      if (ballY > 590) {
+        if (ballX > paddleX && ballX < paddleX + paddle.offsetWidth) {
+          ballSpeedY *= -1;
+        } else {
+          // Game over
+          clearInterval(gameInterval);
+          gameover.style.display = "block";
+        }
+      }
+
+      ball.style.left = ballX + "px";
+      ball.style.top = ballY + "px";
+    }
+
+    function check
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Brick Breaker Game</title>
+  <style>
+    /* ... previous CSS code ... */
+
+    #gameover {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #FFFFFF;
+      font-size: 40px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div class="paddle" id="paddle"></div>
+    <div class="ball" id="ball"></div>
+    <div id="bricks"></div>
+    <div id="score">Score: 0</div>
+    <div id="gameover">Game Over!</div>
+  </div>
+
+  <script>
+    const paddle = document.getElementById("paddle");
+    const ball = document.getElementById("ball");
+    const bricksContainer = document.getElementById("bricks");
+    const scoreDisplay = document.getElementById("score");
+
+    let ballX = 390;
+    let ballY = 550;
+    let ballSpeedX = 3;
+    let ballSpeedY = -3;
+
+    let paddleX = 360;
+
+    let score = 0;
+
+    let bricks = [];
+
+    const brickRowCount = 5;
+    const brickColumnCount = 10;
+    const brickWidth = 70;
+    const brickHeight = 20;
+    const brickPadding = 10;
+    const brickOffsetTop = 30;
+    const brickOffsetLeft = 30;
+
+    function createBricks() {
+      for (let c = 0; c < brickColumnCount; c++) {
+        for (let r = 0; r < brickRowCount; r++) {
+          const brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
+          const brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
+          const brick = document.createElement("div");
+          brick.classList.add("brick");
+          brick.style.left = brickX + "px";
+          brick.style.top = brickY + "px";
+          bricksContainer.appendChild(brick);
+          bricks.push(brick);
+        }
+      }
+    }
+
+    function updateScore() {
+      scoreDisplay.innerText = "Score: " + score;
+    }
+
+    function movePaddle(e) {
+      const gameArea = document.getElementById("game");
+      const gameAreaRect = gameArea.getBoundingClientRect();
+      paddleX = e.clientX - gameAreaRect.left - paddle.offsetWidth / 2;
+      if (paddleX < 0) {
+        paddleX = 0;
+      }
+      if (paddleX > gameArea.offsetWidth - paddle.offsetWidth) {
+        paddleX = gameArea.offsetWidth - paddle.offsetWidth;
+      }
+      paddle.style.left = paddleX + "px";
+    }
+
+    function moveBall() {
+      ballX += ballSpeedX;
+      ballY += ballSpeedY;
+
+      if (ballX < 0 || ballX > 790) {
+        ballSpeedX *= -1;
+      }
+
+      if (ballY < 0) {
+        ballSpeedY *= -1;
+      }
+
+      if (ballY > 590) {
+        if (ballX > paddleX && ballX < paddleX + paddle.offsetWidth) {
+          ballSpeedY *= -1;
+        } else {
+          // Game over
+          clearInterval(gameInterval);
+          gameover.style.display = "block";
+        }
+      }
+
+      ball.style.left = ballX + "px";
+      ball.style.top = ballY + "px";
+    }
+
+    function checkCollision() {
+      bricks.forEach((brick, index) => {
+        const brickRect = brick.getBoundingClientRect();
+        if (
+          ballX + ball.offsetWidth > brickRect.left &&
+          ballX < brickRect.left + brick.offsetWidth &&
+          ballY + ball.offsetHeight > brickRect.top &&
+          ballY < brickRect.top + brick.offsetHeight
+        ) {
+          ballSpeedY *= -1;
+          brick.remove();
+          bricks.splice(index, 1);
+          score++;
+          updateScore();
+          checkGameOver();
+        }
+      });
+    }
+
+    function checkGameOver() {
+      if (bricks.length === 0) {
+        gameover.style.display = "block";
+        document.removeEventListener("mousemove", movePaddle);
+        return true;
+      }
+      return false;
+    }
+
+    function gameLoop() {
+      moveBall();
+      checkCollision();
+      if (!checkGameOver()) {
+        requestAnimationFrame(gameLoop);
+      }
+    }
+
+    // Event listeners
+    document.addEventListener("mousemove", movePaddle);
+
+    // Create bricks and start the game
+    createBricks();
+    gameLoop();
+  </script>
+</body>
+</html>
+
+
